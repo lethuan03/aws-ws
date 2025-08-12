@@ -1,132 +1,132 @@
 [
 {
-	"uri": "/vi/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/",
 	"title": "S3 Storage Analytics &amp; Optimization",
 	"tags": [],
 	"description": "",
 	"content": "Làm việc với Amazon S3 - Storage Analytics \u0026amp; Optimization Tổng quan Trong bài lab này, bạn sẽ tìm hiểu các khái niệm cơ bản và thực hành về phân tích và tối ưu hóa dung lượng lưu trữ S3.\nBao gồm các bước chuẩn bị, phân tích dữ liệu, dự đoán dung lượng, tối ưu hóa chi phí và dọn dẹp tài nguyên sau khi hoàn thành.\nNội dung Giới thiệu Các bước chuẩn bị Phân tích và tối ưu hóa lưu trữ Phân tích dự báo dung lượng Dọn dẹp tài nguyên "
 },
 {
-	"uri": "/vi/1-introduce/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/1-introduce/",
 	"title": "Giới thiệu",
 	"tags": [],
 	"description": "",
 	"content": "Advanced S3 Analytics và Storage Optimization là một giải pháp nâng cao trong việc phân tích và tối ưu hóa lưu trữ dữ liệu trên dịch vụ Amazon S3. Giải pháp này tận dụng các công cụ phân tích như S3 Storage Lens, S3 Inventory, Storage Class Analysis kết hợp với Athena, Glue, QuickSight và tự động hoá bằng Lambda để giúp doanh nghiệp giảm chi phí lưu trữ, tối ưu mô hình truy cập dữ liệu, và lập kế hoạch dung lượng chính xác trong tương lai.\nHệ thống còn hỗ trợ phân tích xu hướng truy cập, xác định dữ liệu “nóng” và “lạnh”, từ đó đưa ra khuyến nghị hoặc áp dụng tự động các chính sách lifecycle (chuyển dữ liệu sang các tier rẻ hơn như Intelligent-Tiering, Glacier) mà không cần thao tác thủ công. Ngoài ra, dữ liệu phân tích và dự báo dung lượng được trình bày trực quan trên dashboard giúp nhà quản trị đưa ra quyết định nhanh chóng.\nVới việc triển khai Advanced S3 Analytics và Storage Optimization, bạn sẽ có được những ưu điểm sau:\nGiảm chi phí lưu trữ bằng cách tự động chuyển dữ liệu ít truy cập sang tier chi phí thấp.\nPhân tích pattern truy cập dữ liệu để xác định tài nguyên cần tối ưu.\nTự động cập nhật Lifecycle Policies dựa trên kết quả phân tích.\nLập kế hoạch dung lượng (capacity planning) với dự báo tăng trưởng dữ liệu.\nTheo dõi và giám sát dung lượng, chi phí và hiệu suất qua dashboard trực quan.\nTính toán ROI để đánh giá hiệu quả tối ưu hóa.\ngiúp tuân thủ chính sách quản trị dữ liệu nhờ việc ghi nhận và lưu trữ đầy đủ thông tin truy cập.\nVới những lợi ích này, Advanced S3 Analytics và Storage Optimization không chỉ giúp tiết kiệm chi phí lưu trữ mà còn tăng hiệu quả quản trị dữ liệu, đảm bảo khả năng mở rộng hệ thống một cách bền vững và thông minh.\n"
 },
 {
-	"uri": "/vi/2-preparation-steps/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/2-preparation-steps/",
 	"title": "Các bước chuẩn bị",
 	"tags": [],
 	"description": "",
 	"content": "\rĐể thực hiện bài lab này, bạn cần chuẩn bị:\nMột IAM User hoặc IAM Role có quyền truy cập S3 và các dịch vụ liên quan Một S3 bucket để lưu dữ liệu, metrics và báo cáo Bạn có thể tham khảo các bài lab:\nGiới thiệu về IAM Host web tĩnh với S3 Nội dung 2.1 – Chuẩn bị IAM 2.2 – S3 Storage Lens 2.3 – S3 Inventory \u0026amp; Athena "
 },
 {
-	"uri": "/vi/2-preparation-steps/2.2-s3-storage-lens/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/2-preparation-steps/2.2-s3-storage-lens/",
 	"title": "Bật S3 Storage Lens",
 	"tags": [],
 	"description": "",
 	"content": "\nTruy cập vào giao diện quản trị của Amazon S3.\nỞ menu bên trái, click Storage Lens. Click Create dashboard. Cấu hình dashboard:\nDashboard name: nhập ví dụ advanced-s3-analytics. AWS Organizations: để trống nếu không dùng Organization. Home Region: chọn region trùng với bucket data analytics. Metrics: tick chọn Advanced metrics and recommendations (có phí nhưng cần cho workshop này). Export destination: Chọn Export metrics to S3 bucket. Chọn bucket đã tạo ở bước trước (ví dụ s3-analytics-data). Review lại cấu hình và click Create dashboard. Sau vài giờ, dữ liệu sẽ bắt đầu hiển thị trên dashboard Storage Lens. Bạn có thể xem chi tiết: dung lượng theo storage class, access frequency, top buckets, object counts… S3 Storage Lens cung cấp dữ liệu thống kê ở cấp tài khoản hoặc cấp tổ chức, bao gồm thông tin về dung lượng lưu trữ, số lượng object, và pattern truy cập. Với tùy chọn Advanced metrics, bạn sẽ có thêm các chỉ số chi tiết hơn và đề xuất tối ưu chi phí.\nXác nhận quyền truy cập: User hoặc role của bạn cần quyền s3:GetStorageLensConfiguration, s3:ListAllMyBuckets, s3:GetBucket* để xem dashboard. Nếu không thấy dữ liệu, hãy kiểm tra lại quyền IAM hoặc bucket export destination. Sau khi bật S3 Storage Lens, chúng ta sẽ cấu hình S3 Inventory để thu thập metadata chi tiết cho từng object và phục vụ truy vấn qua Athena.\n"
 },
 {
-	"uri": "/vi/2-preparation-steps/2.3-s3-inventory-athena/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/2-preparation-steps/2.3-s3-inventory-athena/",
 	"title": "Cấu hình S3 Inventory &amp; Truy vấn qua Athena",
 	"tags": [],
 	"description": "",
 	"content": " Truy cập vào Amazon S3 Console.\nChọn bucket chứa dữ liệu (ví dụ my-app-data). Vào tab Management → Inventory configurations → Create inventory configuration. Cấu hình Inventory:\nName: object-metadata-inventory. Destination: bucket đích (ví dụ s3-analytics-data) — nơi S3 sẽ lưu báo cáo inventory. Format: Parquet (khuyến nghị). Schedule: Daily. Included object versions: Current versions only. Optional fields: chọn Size, LastModifiedDate, StorageClass, ETag. Prefix (optional): giới hạn theo thư mục con nếu cần. Click Save. Báo cáo đầu tiên sẽ xuất hiện sau tối đa 24 giờ tại bucket đích.\nS3 Inventory là báo cáo định kỳ — không chạy tức thời. Nếu cần demo nhanh, có thể tạo dữ liệu mẫu và dùng Glue/Athena để thử trước.\nTạo bảng trong Glue Catalog bằng Glue Crawler: Vào AWS Glue → Crawlers → Add crawler.\nData store: S3 → trỏ đến prefix chứa báo cáo inventory. Role: cần s3:GetObject, s3:ListBucket, glue:*. Database: ví dụ s3_inventory_db → chạy crawler để tạo bảng. Dùng Glue Crawler giúp tự động phát hiện schema của file Parquet inventory.\nNếu muốn tự viết DDL trong Athena, ví dụ: CREATE EXTERNAL TABLE IF NOT EXISTS s3_inventory_table ( bucket string, key string, size bigint, last_modified_date timestamp, storage_class string, etag string ) STORED AS PARQUET LOCATION \u0026lsquo;s3://s3-analytics-data/inventory/my-app-data/\u0026rsquo;;\nLưu ý: Kiểm tra schema thực tế của file Parquet và điều chỉnh tên cột/kiểu dữ liệu cho đúng.\nTrong Athena, vào Settings và đặt Query result location:\ns3://s3-analytics-data/athena-results/ (cần s3:PutObject). Ví dụ truy vấn:\nTổng dung lượng theo Storage Class: SELECT storage_class, COUNT(*) AS object_count, SUM(size)/1024/1024 AS total_mb FROM s3_inventory_table GROUP BY storage_class ORDER BY total_mb DESC; Object không chỉnh sửa \u0026gt; 90 ngày: SELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026lsquo;day\u0026rsquo;, -90, current_date) ORDER BY size DESC LIMIT 100; Lưu danh sách cold objects: CREATE TABLE cold_objects WITH ( format = \u0026lsquo;PARQUET\u0026rsquo;, external_location = \u0026lsquo;s3://s3-analytics-data/athena-results/cold_objects/\u0026rsquo; ) AS SELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026lsquo;day\u0026rsquo;, -90, current_date); Quyền cần thiết:\nathena:StartQueryExecution s3:GetObject, s3:ListBucket cho bucket dữ liệu s3:PutObject cho bucket lưu query results "
 },
 {
-	"uri": "/vi/2-preparation-steps/2.1-creatiam/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/2-preparation-steps/2.1-creatiam/",
 	"title": "Chuẩn bị tài khoản và quyền truy cập",
 	"tags": [],
 	"description": "",
 	"content": " Tạo S3 admin\nclick vào user group đặt tên s3 admin Tick chọn các policy sau: AmazonS3FullAccess AmazonAthenaFullAccess AWSGlueConsoleFullAccess AmazonQuickSightFullAccess AWSLambda_FullAccess\nbấm create user group để tạo Truy cập vào giao diện quản trị của dịch vụ IAM.\nClick Users.\nClick Create User. Nhập tên ví dụ: s3-analytics-user.\nClick Next:cho đến khi tạo xong user. chọn user cần cấp quyền ( permissions):\nClick Add perrmisson.\nClick chọn s3 Admin để thêm user vào.\nNếu bạn triển khai trong AWS Organization hoặc muốn quản lý tập trung, nên cấp quyền qua IAM Role và gán cho user/role đó để dễ thu hồi và audit sau này.\nTruy cập vào giao diện quản trị của dịch vụ S3 Tạo 1 bucket mới đặt tên ví dụ: s3-analytics-data (lưu kết quả inventory \u0026amp; metrics export). Chọn region mà bạn sẽ dùng cho toàn bộ workshop. Giữ nguyên các setting mặc định trừ khi cần bật versioning hoặc encryption. Truy cập vào giao diện quản trị của dịch vụ AWS QuickSight Nếu là lần đầu sử dụng, click Sign up for QuickSight. Chọn Enterprise Edition (dùng trial nếu chỉ demo). Chọn region trùng với bucket S3 và Athena. Cho phép QuickSight truy cập S3, Athena, và Glue. SS Ở bước này, bạn đã sẵn sàng để cấu hình S3 Storage Lens, S3 Inventory, và thiết lập pipeline analytics. Hãy đảm bảo user/role của bạn có đủ quyền truy cập trước khi qua phần tiếp theo.\nBạn có thể sign out để lưu thông tin cấu hình trước khi tiếp tục với phần triển khai analytics pipeline.\n"
 },
 {
-	"uri": "/vi/3-analytics/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/",
 	"title": "Phân tích và Tối ưu hóa",
 	"tags": [],
 	"description": "",
 	"content": "\rTrong phần này, chúng ta sẽ triển khai các bước phân tích dữ liệu S3, tối ưu hóa chi phí lưu trữ, dự đoán dung lượng, tự động hóa cập nhật chính sách và theo dõi hiệu quả tối ưu hóa.\nNội dung 3.1 – Phân tích \u0026amp; Tối ưu hóa Storage Class 3.2 – Dự đoán dung lượng lưu trữ 3.3 – Tự động cập nhật Lifecycle Policy 3.4 – Tính toán ROI từ tối ưu hóa 3.5 – Dashboard giám sát "
 },
 {
-	"uri": "/vi/3-analytics/3.5-monitoring-dashboard/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/3.5-monitoring-dashboard/",
 	"title": "Bảng điều khiển giám sát",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu:\nCung cấp cái nhìn tập trung về các chỉ số chính của S3, tiến độ tối ưu hóa, xu hướng chi phí và ROI theo thời gian thực, giúp đưa ra quyết định dựa trên dữ liệu.\nChuẩn bị nguồn dữ liệu:\nAWS CloudWatch Metrics để theo dõi hoạt động cấp bucket (request, băng thông, độ trễ). AWS S3 Storage Lens để lấy số liệu dung lượng lưu trữ, số lượng object và tác động của lifecycle policy. AWS Cost Explorer / CUR (Cost and Usage Report) cho dữ liệu chi phí. Athena để chạy truy vấn SQL trên dữ liệu CUR. Tạo bảng điều khiển trong QuickSight:\nTruy cập Amazon QuickSight. Tạo dataset mới từ Athena hoặc dữ liệu export của S3 Storage Lens. Xây dựng các biểu đồ như: Xu hướng dung lượng lưu trữ (GB/TB theo thời gian). Bản đồ nhiệt lưu lượng truy cập. Phân tích chi phí theo storage class. Tỷ lệ ROI % từ công thức trong phần 1.7. Thiết lập lịch làm mới dữ liệu:\nCấu hình QuickSight refresh dữ liệu hàng ngày hoặc hàng giờ tùy nhu cầu. Tối ưu truy vấn Athena trên CUR để giảm chi phí xử lý. Tích hợp cảnh báo bất thường:\nSử dụng CloudWatch Alarms để phát hiện chi phí tăng đột biến hoặc lưu lượng truy cập bất thường. Gửi cảnh báo qua Amazon SNS tới email hoặc Slack. Chia sẻ cho các bên liên quan:\nThiết lập quyền trong QuickSight để các nhóm liên quan (Ops, Finance, Data) có thể truy cập. Có thể nhúng dashboard vào portal nội bộ. Một dashboard được thiết kế tốt không chỉ giúp theo dõi hiệu quả tối ưu hóa liên tục mà còn thúc đẩy sự phối hợp giữa các nhóm kỹ thuật, vận hành và tài chính.\n"
 },
 {
-	"uri": "/vi/3-analytics/3.2-storage-capacity-prediction/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/3.2-storage-capacity-prediction/",
 	"title": "Dự đoán Dung lượng Lưu trữ (Predictive Analytics)",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu: Sử dụng dữ liệu lịch sử từ S3 Inventory để dự đoán nhu cầu lưu trữ trong tương lai, phục vụ capacity planning.\nChuẩn bị dữ liệu lịch sử:\nĐảm bảo S3 Inventory đã chạy ít nhất 7–14 ngày để có dữ liệu liên tục. Trong Athena, tạo bảng chứa dung lượng tổng theo ngày: CREATE TABLE daily_storage_usage AS SELECT date(last_modified_date) AS usage_date, SUM(size) / 1024 / 1024 / 1024 AS total_gb FROM s3_inventory_table GROUP BY date(last_modified_date) ORDER BY usage_date; Xuất dữ liệu này ra S3 để phục vụ phân tích:\nCREATE TABLE daily_storage_export WITH ( format = \u0026#39;CSV\u0026#39;, external_location = \u0026#39;s3://s3-analytics-data/athena-results/daily_storage_usage/\u0026#39; ) AS SELECT * FROM daily_storage_usage; Phân tích và dự đoán bằng Amazon Forecast:\nTruy cập Amazon Forecast Console. Tạo Dataset kiểu TARGET_TIME_SERIES từ file CSV đã export ở trên. Chọn Domain = Custom, đơn vị đo là GB. Tạo Predictor với thuật toán Prophet hoặc DeepAR+. Chạy dự đoán với Forecast horizon = 30 ngày. Xem kết quả dự đoán:\nForecast trả về file kết quả dự đoán dung lượng theo ngày. Có thể import dữ liệu này vào QuickSight để hiển thị biểu đồ xu hướng. Việc dự đoán dung lượng giúp chủ động lập kế hoạch ngân sách và điều chỉnh chính sách lifecycle trước khi vượt ngưỡng chi phí mong muốn.\n"
 },
 {
-	"uri": "/vi/3-analytics/3.1-analyze--optimize-storage-class/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/3.1-analyze--optimize-storage-class/",
 	"title": "Phân tích &amp; Tối ưu Storage Class",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu của bước này: Xác định dữ liệu cold hoặc ít truy cập để di chuyển sang Storage Class phù hợp, giúp tối ưu chi phí.\nTruy vấn Athena để tìm đối tượng cold (\u0026gt;90 ngày không chỉnh sửa) và dung lượng lớn:\nSELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date) AND size \u0026gt; 1024*1024*100 -- \u0026gt;100MB ORDER BY size DESC; Xuất danh sách cold objects ra S3: CREATE TABLE cold_candidates WITH ( format = \u0026#39;CSV\u0026#39;, external_location = \u0026#39;s3://s3-analytics-data/athena-results/cold_candidates/\u0026#39; ) AS SELECT key FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date); Tạo Lifecycle Policy tự động chuyển cold objects sang S3 Glacier Instant Retrieval: Truy cập S3 Console. Chọn bucket cần tối ưu. Tab Management → Lifecycle rules → Create lifecycle rule. Chọn Filter by prefix nếu cần. Chọn Transition current versions of objects → Glacier Instant Retrieval sau 90 ngày. Bật Expire objects nếu muốn xóa sau N ngày. Click Create rule. Việc chuyển Storage Class giúp tiết kiệm 40-80% chi phí cho dữ liệu ít truy cập. Glacier Instant Retrieval vẫn cho phép truy cập gần như tức thời nhưng có giá lưu trữ thấp hơn Standard.\n"
 },
 {
-	"uri": "/vi/3-analytics/3.3-automated-lifecycle-policy-updates/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/3.3-automated-lifecycle-policy-updates/",
 	"title": "Tự động cập nhật Lifecycle Policy",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu:\nTự động hóa việc cập nhật Lifecycle Policy dựa trên kết quả phân tích cold data từ Athena, giảm thiểu thao tác thủ công và đảm bảo chính sách tối ưu được áp dụng liên tục.\nChuẩn bị Lambda Function:\nTruy cập AWS Lambda Console. Create function → Author from scratch: Name: update-s3-lifecycle Runtime: Python 3.9 Role: Gán IAM Role có quyền s3:PutLifecycleConfiguration và athena:GetQueryResults. Trong phần code, thêm logic: import boto3 s3 = boto3.client(\u0026#39;s3\u0026#39;) def lambda_handler(event, context): bucket_name = \u0026#39;your-bucket-name\u0026#39; lifecycle_config = { \u0026#39;Rules\u0026#39;: [ { \u0026#39;ID\u0026#39;: \u0026#39;ColdDataToGlacier\u0026#39;, \u0026#39;Prefix\u0026#39;: \u0026#39;\u0026#39;, \u0026#39;Status\u0026#39;: \u0026#39;Enabled\u0026#39;, \u0026#39;Transitions\u0026#39;: [ { \u0026#39;Days\u0026#39;: 90, \u0026#39;StorageClass\u0026#39;: \u0026#39;GLACIER_IR\u0026#39; } ] } ] } s3.put_bucket_lifecycle_configuration( Bucket=bucket_name, LifecycleConfiguration=lifecycle_config ) return {\u0026#39;status\u0026#39;: \u0026#39;Lifecycle updated\u0026#39;} Kích hoạt Lambda bằng EventBridge:\nTruy cập Amazon EventBridge Console. Create rule: Name: daily-lifecycle-update Schedule: cron(0 1 * * ? *) (chạy 1h sáng UTC hàng ngày). Target: Lambda function update-s3-lifecycle. Kiểm tra:\nChạy Test trong Lambda Console để đảm bảo policy mới được áp dụng cho bucket. Kiểm tra tab Management → Lifecycle rules trong S3 Console. Với cơ chế này, Lifecycle Policy sẽ luôn được cập nhật theo dữ liệu mới nhất, đảm bảo chi phí lưu trữ tối ưu mà không cần thao tác thủ công.\n"
 },
 {
-	"uri": "/vi/3-analytics/3.4-roi-calculation-from-optimization/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/3-analytics/3.4-roi-calculation-from-optimization/",
 	"title": "Tự động cập nhật Lifecycle Policy và Tính toán ROI",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu:\nTự động hóa việc cập nhật Lifecycle Policy dựa trên kết quả phân tích cold data từ Athena, giảm thiểu thao tác thủ công và đảm bảo chính sách tối ưu được áp dụng liên tục.\nChuẩn bị Lambda Function:\nTruy cập AWS Lambda Console. Create function → Author from scratch: Name: update-s3-lifecycle Runtime: Python 3.9 Role: Gán IAM Role có quyền s3:PutLifecycleConfiguration và athena:GetQueryResults. Trong phần code, thêm logic: import boto3 s3 = boto3.client(\u0026#39;s3\u0026#39;) def lambda_handler(event, context): bucket_name = \u0026#39;your-bucket-name\u0026#39; lifecycle_config = { \u0026#39;Rules\u0026#39;: [ { \u0026#39;ID\u0026#39;: \u0026#39;ColdDataToGlacier\u0026#39;, \u0026#39;Prefix\u0026#39;: \u0026#39;\u0026#39;, \u0026#39;Status\u0026#39;: \u0026#39;Enabled\u0026#39;, \u0026#39;Transitions\u0026#39;: [ { \u0026#39;Days\u0026#39;: 90, \u0026#39;StorageClass\u0026#39;: \u0026#39;GLACIER_IR\u0026#39; } ] } ] } s3.put_bucket_lifecycle_configuration( Bucket=bucket_name, LifecycleConfiguration=lifecycle_config ) return {\u0026#39;status\u0026#39;: \u0026#39;Lifecycle updated\u0026#39;} Kích hoạt Lambda bằng EventBridge:\nTruy cập Amazon EventBridge Console. Create rule: Name: daily-lifecycle-update Schedule: cron(0 1 * * ? *) (chạy 1h sáng UTC hàng ngày). Target: Lambda function update-s3-lifecycle. Kiểm tra:\nChạy Test trong Lambda Console để đảm bảo policy mới được áp dụng cho bucket. Kiểm tra tab Management → Lifecycle rules trong S3 Console. Với cơ chế này, Lifecycle Policy sẽ luôn được cập nhật theo dữ liệu mới nhất, đảm bảo chi phí lưu trữ tối ưu mà không cần thao tác thủ công.\n1.7 – Tính toán ROI từ Tối ưu hóa Mục tiêu:\nXác định hiệu quả tài chính của các hoạt động tối ưu hóa lưu trữ S3 bằng cách so sánh chi phí trước và sau khi áp dụng các chính sách lifecycle, phân loại storage class, và dự đoán dung lượng.\nChuẩn bị dữ liệu chi phí:\nTruy cập AWS Cost Explorer. Chọn Service = Amazon S3. Lọc dữ liệu Before Optimization (ví dụ: 30 ngày trước khi áp dụng policy) và After Optimization (30 ngày sau). Xuất file CSV. Tính ROI với Athena hoặc Excel:\nCông thức: ROI (%) = ((Chi phí trước - Chi phí sau) / Chi phí trước) * 100 Ví dụ trong Athena:\nSELECT ((before_cost - after_cost) / before_cost) * 100 AS roi_percentage FROM ( SELECT SUM(CASE WHEN month = \u0026#39;2024-05\u0026#39; THEN amount ELSE 0 END) AS before_cost, SUM(CASE WHEN month = \u0026#39;2024-06\u0026#39; THEN amount ELSE 0 END) AS after_cost FROM s3_cost_data ) t; Tự động báo cáo ROI qua Email: Sử dụng AWS Lambda + Amazon SES để gửi báo cáo định kỳ.\nNội dung email gồm:\nChi phí trước tối ưu hóa.\nChi phí sau tối ưu hóa.\nROI % và số tiền tiết kiệm được.\nCron job qua EventBridge để chạy hàng tháng.\nHiển thị trên Dashboard: Dùng Amazon QuickSight để tạo widget “ROI %” và biểu đồ chi phí theo thời gian.\nDashboard giúp theo dõi hiệu quả dài hạn của chiến lược tối ưu. Việc theo dõi ROI liên tục không chỉ giúp minh bạch hiệu quả mà còn cung cấp số liệu thuyết phục khi đề xuất các dự án tối ưu hóa tiếp theo.\n"
 },
 {
-	"uri": "/vi/4-analytics-for-capacity/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/4-analytics-for-capacity/",
 	"title": "Phân tích cho Kế hoạch Dung lượng",
 	"tags": [],
 	"description": "",
 	"content": "\rPhần này tập trung vào việc áp dụng phân tích dự đoán để lập kế hoạch dung lượng lưu trữ, triển khai tự động chính sách lifecycle và áp dụng các thực hành tốt nhất nhằm tối ưu hóa hiệu quả lưu trữ dài hạn.\nNội dung 4.1 – Phân tích dự đoán cho kế hoạch dung lượng 4.2 – Triển khai tự động chính sách Lifecycle 4.3 – Thực hành tốt nhất "
 },
 {
-	"uri": "/vi/4-analytics-for-capacity/4.1-predictive-analytics-for-capacity-planning/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/4-analytics-for-capacity/4.1-predictive-analytics-for-capacity-planning/",
 	"title": "Phân Tích Dự Đoán cho Lập Kế Hoạch Dung Lượng",
 	"tags": [],
 	"description": "",
 	"content": "\nMục tiêu:\nSử dụng dữ liệu lịch sử của S3 để dự đoán nhu cầu lưu trữ trong tương lai (3, 6, 12 tháng), giúp tối ưu chi phí và tránh tình trạng thiếu hụt dung lượng.\nChuẩn bị dữ liệu:\nTrích xuất dữ liệu S3 Storage Lens hoặc AWS Cost \u0026amp; Usage Report (CUR). Lưu dữ liệu vào S3 và định dạng CSV/Parquet. Tạo bảng dữ liệu trong AWS Glue Data Catalog. Phân tích dự đoán với Amazon Forecast:\nTruy cập Amazon Forecast. Tạo Dataset Group và import dữ liệu lưu trữ đã chuẩn bị. Chọn thuật toán Prophet hoặc DeepAR+ để dự đoán theo chuỗi thời gian. Chạy dự đoán cho 90–365 ngày tiếp theo. Trực quan hóa kết quả:\nXuất kết quả dự đoán về S3. Tích hợp kết quả vào QuickSight cùng với dashboard 1.8. Hiển thị biểu đồ xu hướng tăng trưởng dung lượng. Ứng dụng kết quả:\nĐiều chỉnh lifecycle policy dựa trên dự báo. Lên kế hoạch ngân sách cho dung lượng sắp tới. Bước này giúp nhóm vận hành chủ động hơn, tránh phải mua thêm dung lượng gấp rút hoặc để dữ liệu không cần thiết chiếm chỗ.\n"
 },
 {
-	"uri": "/vi/4-analytics-for-capacity/4.3-practices/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/4-analytics-for-capacity/4.3-practices/",
 	"title": "Tổng Kết &amp; Best Practices",
 	"tags": [],
 	"description": "",
 	"content": " Những gì đã thực hiện:\nThiết lập phân tích nâng cao cho S3 (1.8). Dự đoán nhu cầu lưu trữ tương lai với Amazon Forecast (1.9). Tự động triển khai lifecycle policy (1.10). Best Practices:\nTheo dõi định kỳ: Xem báo cáo Storage Lens mỗi tháng. Tự động hóa tối đa: Sử dụng Lambda \u0026amp; EventBridge để giảm thao tác thủ công. Quản lý quyền chặt chẽ: Chỉ cấp quyền cần thiết cho IAM role. Kết hợp nhiều lớp lưu trữ: Sử dụng Glacier cho dữ liệu ít truy cập. Dự phòng ngân sách: Luôn lập kế hoạch tài chính cho ít nhất 6–12 tháng. Lợi ích đạt được:\nGiảm chi phí lưu trữ đáng kể. Cải thiện hiệu suất truy cập dữ liệu. Giảm tải công việc cho đội vận hành. "
 },
 {
-	"uri": "/vi/4-analytics-for-capacity/4.2-automated-lifecycle-policy-deployment/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/4-analytics-for-capacity/4.2-automated-lifecycle-policy-deployment/",
 	"title": "Triển Khai Tự Động Lifecycle Policy",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu:\nSử dụng kết quả phân tích (1.8 và 1.9) để tự động áp dụng Lifecycle Policies nhằm di chuyển hoặc xóa dữ liệu theo quy tắc tối ưu chi phí.\nChuẩn bị:\nXác định bucket và prefix cần áp dụng policy. Xác định điều kiện: tuổi file, access pattern, dung lượng. Tạo role IAM với quyền s3:PutLifecycleConfiguration. Cấu hình Lambda function:\nTruy cập AWS Lambda. Tạo hàm Python hoặc Node.js để đọc kết quả phân tích từ S3/Glue. Gọi API put_bucket_lifecycle_configuration để cập nhật policy. Thiết lập EventBridge rule:\nLập lịch chạy Lambda hàng ngày/tuần. Kích hoạt cập nhật policy khi dữ liệu dự báo thay đổi. Kiểm tra:\nVào S3 Console → Bucket → Management → Lifecycle rules. Đảm bảo rule mới xuất hiện và hoạt động. Việc tự động hóa giúp giảm công sức quản trị và đảm bảo chính sách luôn đồng bộ với tình hình thực tế.\n"
 },
 {
-	"uri": "/vi/5-resource-cleanup/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/5-resource-cleanup/",
 	"title": "Dọn dẹp tài nguyên",
 	"tags": [],
 	"description": "",
 	"content": "\rViệc dọn dẹp tài nguyên sau workshop là rất quan trọng để tránh phát sinh chi phí không mong muốn. Thực hiện cẩn thận — một khi xóa, dữ liệu thường không thể phục hồi nếu không có backup.\nTắt và xóa các dịch vụ theo thứ tự an toàn\nQuickSight: xóa datasets, analyses, dashboards, subscriptions. Forecast: xóa datasets, predictors, forecasts, dataset groups. Athena: dừng workgroup (nếu có) và xóa named queries; đảm bảo query result location (S3) đã bị xóa. Glue: xóa Crawlers, Jobs, Databases, Tables. Lambda: xóa functions và event source mappings. EventBridge: remove targets rồi delete rules. CloudWatch: xóa log groups liên quan. Nếu bật CUR (Cost \u0026amp; Usage Report): disable delivery và xóa prefix trên S3. Disable/ delete S3 Storage Lens configuration nếu bạn đã bật export metrics. Xóa nội dung S3 an toàn\nBucket không versioned: aws s3 rm s3://your-bucket-name --recursive aws s3 rb s3://your-bucket-name Bucket có versioning: cần xóa versions \u0026amp; delete markers (ví dụ script): # Lấy list versions và xóa theo batch (chú ý pagination với bucket lớn) aws s3api list-object-versions --bucket your-bucket-name --query \u0026#39;Versions[].{Key:Key,VersionId:VersionId}\u0026#39; \u0026gt; versions.json # Tạo payload và gọi delete-objects (cần script xử lý) Với bucket rất lớn, cân nhắc dùng script có pagination hoặc AWS S3 Batch Operations.\nXóa Glue / Athena artifacts\nGlue Console → xóa Crawlers, Jobs, Database, Tables. Athena → xóa named queries; xóa S3 folder chứa query results. Xóa QuickSight resources\nQuickSight → Manage data → delete datasets, analyses, dashboards. Nếu không dùng QuickSight nữa, cancel subscription (Enterprise) để tránh phí. Xóa Lambda, EventBridge, CloudWatch\nLambda Console → delete functions. EventBridge → remove targets → delete rules. CloudWatch → delete log groups (vd. /aws/lambda/\u0026lt;function-name\u0026gt;). Xóa IAM roles \u0026amp; policies\nIAM → detach managed policies → delete custom managed policies → delete roles. Xóa inline policies nếu có. Xóa các tài nguyên ML (nếu đã dùng)\nForecast → delete datasets, predictors, forecasts, dataset groups. SageMaker → stop \u0026amp; delete endpoints, endpoint-configs, models, training jobs (nếu có). Kiểm tra \u0026amp; xác nhận\nKiểm tra Billing / Cost Explorer trong 24–48 giờ sau để đảm bảo không còn tài nguyên sinh phí. Dùng aws s3 ls hoặc console để xác nhận buckets đã bị xóa. Thứ tự an toàn: tắt services → xóa dữ liệu → xóa resources (roles/policies). CUR và một số logs có thể chứa dữ liệu lịch sử — nếu xóa, bạn sẽ mất lịch sử báo cáo. Với buckets versioned hoặc chứa nhiều object, thao tác xóa có thể tốn thời gian và cần script chuyên dụng. Checklist nhanh trước khi rời:\nQuickSight cleaned Forecast cleaned Athena query results removed Glue crawlers/tables removed Lambda \u0026amp; EventBridge removed CloudWatch logs removed IAM roles/policies removed S3 buckets emptied \u0026amp; deleted "
 },
 {
-	"uri": "/vi/categories/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/categories/",
 	"title": "Categories",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "/vi/tags/",
+	"uri": "https://lethuan03.github.io/aws-ws/vi/tags/",
 	"title": "Tags",
 	"tags": [],
 	"description": "",

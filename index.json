@@ -1,132 +1,132 @@
 [
 {
-	"uri": "/",
+	"uri": "https://lethuan03.github.io/aws-ws/",
 	"title": "S3 Storage Analytics &amp; Optimization",
 	"tags": [],
 	"description": "",
 	"content": "Working with Amazon S3 - Storage Analytics \u0026amp; Optimization Overview In this lab, you will learn the fundamentals and hands-on practice of analyzing and optimizing S3 storage.\nThe lab includes preparation steps, data analytics, capacity prediction, cost optimization, and resource cleanup after completion.\nS\nContent Introduction Preparation Steps Analyze \u0026amp; Optimize Storage Analytics for Capacity Planning Resource Cleanup "
 },
 {
-	"uri": "/1-introduce/",
+	"uri": "https://lethuan03.github.io/aws-ws/1-introduce/",
 	"title": "Introduction",
 	"tags": [],
 	"description": "",
 	"content": "Advanced S3 Analytics and Storage Optimization is an advanced solution for analyzing and optimizing data storage on Amazon S3. This approach leverages analytics tools such as S3 Storage Lens, S3 Inventory, and Storage Class Analysis, combined with Athena, Glue, QuickSight, and automation with Lambda to help organizations reduce storage costs, optimize data access patterns, and accurately plan storage capacity for the future.\nThe system supports analyzing access trends, identifying “hot” and “cold” data, and then recommending or automatically applying lifecycle policies (transitioning data to lower-cost tiers such as Intelligent-Tiering or Glacier) without manual intervention. In addition, storage analytics and capacity forecasts are visualized in intuitive dashboards, enabling administrators to make quick, informed decisions.\nBy implementing Advanced S3 Analytics and Storage Optimization, you can gain the following advantages:\nReduce storage costs by automatically moving infrequently accessed data to lower-cost tiers.\nAnalyze data access patterns to identify optimization opportunities.\nAutomatically update Lifecycle Policies based on analytics results.\nPerform capacity planning with data growth forecasting.\nMonitor storage usage, costs, and performance through interactive dashboards.\nCalculate ROI to measure optimization effectiveness.\nSupport compliance with data governance policies by logging and storing access information.\nWith these benefits, Advanced S3 Analytics and Storage Optimization not only reduces storage expenses but also improves data management efficiency, ensuring your system can scale sustainably and intelligently.\n"
 },
 {
-	"uri": "/2-preparation-steps/",
+	"uri": "https://lethuan03.github.io/aws-ws/2-preparation-steps/",
 	"title": "Preparation Steps",
 	"tags": [],
 	"description": "",
 	"content": "\rTo complete this lab, you will need:\nAn IAM User or IAM Role with permissions to access S3 and related services An S3 bucket to store data, metrics, and reports You can refer to the following labs:\nIntroduction to IAM Host a Static Website with S3 Content 2.1 – Prepare IAM 2.2 – S3 Storage Lens 2.3 – S3 Inventory \u0026amp; Athena "
 },
 {
-	"uri": "/2-preparation-steps/2.3-s3-inventory-athena/",
+	"uri": "https://lethuan03.github.io/aws-ws/2-preparation-steps/2.3-s3-inventory-athena/",
 	"title": "Configure S3 Inventory &amp; Query via Athena",
 	"tags": [],
 	"description": "",
 	"content": " Go to the Amazon S3 Console.\nSelect the bucket containing your data (e.g., my-app-data). Go to the Management tab → Inventory configurations → Create inventory configuration.\nConfigure Inventory:\nName: object-metadata-inventory. Destination: destination bucket (e.g., s3-analytics-data) — where S3 will store the inventory reports. Format: Parquet (recommended). Schedule: Daily. Included object versions: Current versions only. Optional fields: select Size, LastModifiedDate, StorageClass, ETag. Prefix (optional): limit to a specific folder if needed.\nClick Save. The first report will appear in the destination bucket within up to 24 hours.\nS3 Inventory is a periodic report — it does not run in real time. For faster demos, you can generate sample data and use Glue/Athena to test before the first report is ready.\nCreate a table in Glue Catalog using Glue Crawler: Go to AWS Glue → Crawlers → Add crawler.\nData store: S3 → point to the prefix containing the inventory report. Role: must have s3:GetObject, s3:ListBucket, glue:*. Database: e.g., s3_inventory_db → run the crawler to create the table.\nUsing Glue Crawler automatically detects the schema of the Parquet inventory files.\nIf you want to manually write DDL in Athena, for example: CREATE EXTERNAL TABLE IF NOT EXISTS s3_inventory_table ( bucket string, key string, size bigint, last_modified_date timestamp, storage_class string, etag string ) STORED AS PARQUET LOCATION \u0026#39;s3://s3-analytics-data/inventory/my-app-data/\u0026#39;; 6. In Athena, go to Settings and set the Query result location: . s3://s3-analytics-data/athena-results/ (requires s3:PutObject). 7. Example queries: . Total storage by Storage Class: SELECT storage_class, COUNT(*) AS object_count, SUM(size)/1024/1024 AS total_mb FROM s3_inventory_table GROUP BY storage_class ORDER BY total_mb DESC; . Objects not modified in \u0026gt; 90 days: SELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date) ORDER BY size DESC LIMIT 100; . Save cold objects list: CREATE TABLE cold_objects WITH ( format = \u0026#39;PARQUET\u0026#39;, external_location = \u0026#39;s3://s3-analytics-data/athena-results/cold_objects/\u0026#39; ) AS SELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date); Required permissions:\nathena:StartQueryExecution\ns3:GetObject, s3:ListBucket for the data bucket\ns3:PutObject for the query results bucket\n"
 },
 {
-	"uri": "/2-preparation-steps/2.2-s3-storage-lens/",
+	"uri": "https://lethuan03.github.io/aws-ws/2-preparation-steps/2.2-s3-storage-lens/",
 	"title": "Enable S3 Storage Lens",
 	"tags": [],
 	"description": "",
 	"content": "\nGo to the Amazon S3 management console.\nIn the left menu, click Storage Lens. Click Create dashboard. Configure the dashboard:\nDashboard name: for example, advanced-s3-analytics. AWS Organizations: leave blank if you are not using Organizations. Home Region: select the same region as the data analytics bucket. Metrics: tick Advanced metrics and recommendations (this has a cost but is required for this workshop). Export destination: Select Export metrics to S3 bucket. Choose the bucket created in the previous step (e.g., s3-analytics-data). Review your configuration and click Create dashboard. After a few hours, data will begin to appear on the Storage Lens dashboard. You can view details such as: storage usage by storage class, access frequency, top buckets, object counts, and more. S3 Storage Lens provides account-level or organization-level metrics, including information about storage usage, object counts, and access patterns. With the Advanced metrics option, you gain more granular insights and cost optimization recommendations.\nVerify access permissions: Your user or role must have s3:GetStorageLensConfiguration, s3:ListAllMyBuckets, and s3:GetBucket* permissions to view the dashboard. If no data is shown, check IAM permissions or the export destination bucket. After enabling S3 Storage Lens, we will configure S3 Inventory to collect detailed metadata for each object and enable querying via Athena.\n"
 },
 {
-	"uri": "/2-preparation-steps/2.1-creatiam/",
+	"uri": "https://lethuan03.github.io/aws-ws/2-preparation-steps/2.1-creatiam/",
 	"title": "Prepare Account and Access Permissions",
 	"tags": [],
 	"description": "",
 	"content": " Create S3 admin\nClick on User groups Name it s3 admin Tick the following policies: AmazonS3FullAccess AmazonAthenaFullAccess AWSGlueConsoleFullAccess AmazonQuickSightFullAccess AWSLambda_FullAccess\nClick Create user group to create it Go to the IAM service management console.\nClick Users.\nClick Create User. Enter a name, for example: s3-analytics-user.\nClick Next until the user is created.\nSelect the user to grant permissions:\nClick Add permission.\nClick to select s3 Admin to add the user into the group.\nIf you are deploying in AWS Organization or want centralized management, it is recommended to assign permissions via IAM Role and attach it to the user/role for easier revocation and auditing later.\nGo to the S3 management console Create a new bucket, for example: s3-analytics-data (to store inventory \u0026amp; metrics export results). Select the region that you will use for the entire workshop. Keep the default settings unless you need to enable versioning or encryption. Go to the AWS QuickSight management console If this is your first time using it, click Sign up for QuickSight. Choose Enterprise Edition (use trial if only for demo). Select the same region as your S3 bucket and Athena. Allow QuickSight to access S3, Athena, and Glue. At this step, you are ready to configure S3 Storage Lens, S3 Inventory, and set up the analytics pipeline. Make sure your user/role has sufficient permissions before proceeding to the next part.\nYou may sign out to save the configuration before continuing with the analytics pipeline setup.\n"
 },
 {
-	"uri": "/3-analytics/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/",
 	"title": "Analytics and Optimization",
 	"tags": [],
 	"description": "",
 	"content": "\rIn this section, we will implement S3 data analytics, storage cost optimization, capacity prediction, automated policy updates, and monitoring to evaluate optimization efficiency.\nContent 3.1 – Analyze \u0026amp; Optimize Storage Class 3.2 – Storage Capacity Prediction 3.3 – Automated Lifecycle Policy Updates 3.4 – ROI Calculation from Optimization 3.5 – Monitoring Dashboard "
 },
 {
-	"uri": "/3-analytics/3.3-automated-lifecycle-policy-updates/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/3.3-automated-lifecycle-policy-updates/",
 	"title": "Automated Lifecycle Policy Updates",
 	"tags": [],
 	"description": "",
 	"content": " Objective:\nAutomate the update of Lifecycle Policies based on cold data analysis results from Athena, minimizing manual operations and ensuring optimal policies are continuously applied.\nPrepare the Lambda Function:\nGo to the AWS Lambda Console. Create function → Author from scratch: Name: update-s3-lifecycle Runtime: Python 3.9 Role: Assign an IAM Role with permissions s3:PutLifecycleConfiguration and athena:GetQueryResults. In the code section, add the following logic: import boto3 s3 = boto3.client(\u0026#39;s3\u0026#39;) def lambda_handler(event, context): bucket_name = \u0026#39;your-bucket-name\u0026#39; lifecycle_config = { \u0026#39;Rules\u0026#39;: [ { \u0026#39;ID\u0026#39;: \u0026#39;ColdDataToGlacier\u0026#39;, \u0026#39;Prefix\u0026#39;: \u0026#39;\u0026#39;, \u0026#39;Status\u0026#39;: \u0026#39;Enabled\u0026#39;, \u0026#39;Transitions\u0026#39;: [ { \u0026#39;Days\u0026#39;: 90, \u0026#39;StorageClass\u0026#39;: \u0026#39;GLACIER_IR\u0026#39; } ] } ] } s3.put_bucket_lifecycle_configuration( Bucket=bucket_name, LifecycleConfiguration=lifecycle_config ) return {\u0026#39;status\u0026#39;: \u0026#39;Lifecycle updated\u0026#39;} Trigger Lambda with EventBridge:\nGo to the Amazon EventBridge Console. Create rule: Name: daily-lifecycle-update Schedule: cron(0 1 * * ? *) (runs daily at 1 AM UTC). Target: Lambda function update-s3-lifecycle. Testing:\nRun Test in the Lambda Console to ensure the new policy is applied to the bucket. Check the Management → Lifecycle rules tab in the S3 Console. With this approach, the Lifecycle Policy will always be updated based on the latest data, ensuring storage costs remain optimized without manual intervention.\n"
 },
 {
-	"uri": "/3-analytics/3.5-monitoring-dashboard/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/3.5-monitoring-dashboard/",
 	"title": "Monitoring Dashboard",
 	"tags": [],
 	"description": "",
 	"content": " Objective:\nProvide a centralized view of key S3 metrics, optimization progress, cost trends, and ROI in near real-time to facilitate data-driven decisions.\nPrepare your data sources:\nAWS CloudWatch Metrics for bucket-level activity (requests, data transfer, latency). AWS S3 Storage Lens for storage usage, object counts, and lifecycle policy impact. AWS Cost Explorer / CUR (Cost and Usage Report) for financial data. Athena for running SQL queries on CUR data. Create the dashboard in QuickSight:\nGo to Amazon QuickSight. Create a new dataset from Athena or S3 Storage Lens exports. Build visualizations such as: Storage usage trend (GB/TB over time). Request pattern heatmap. Cost breakdown by storage class. ROI % from the calculation in section 1.7. Set up refresh schedules:\nConfigure QuickSight to refresh data daily or hourly depending on requirements. Ensure Athena queries on CUR are optimized to reduce processing cost. Integrate alerts for anomalies:\nUse CloudWatch Alarms to detect sudden cost spikes or unusual request patterns. Send alerts to Amazon SNS for email or Slack notifications. Share with stakeholders:\nSet QuickSight permissions so relevant teams (Ops, Finance, Data) can access and view the dashboard. Optionally embed the dashboard in an internal portal. A well-designed dashboard not only helps track ongoing optimization impact but also fosters collaboration between engineering, operations, and finance teams.\n"
 },
 {
-	"uri": "/3-analytics/3.4-roi-calculation-from-optimization/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/3.4-roi-calculation-from-optimization/",
 	"title": "ROI Calculation from Optimization",
 	"tags": [],
 	"description": "",
 	"content": " Objective:\nDetermine the financial effectiveness of S3 storage optimization activities by comparing costs before and after implementing lifecycle policies, storage class adjustments, and capacity forecasting.\nPrepare cost data:\nGo to AWS Cost Explorer. Set Service = Amazon S3. Filter data for Before Optimization (e.g., 30 days before lifecycle policies) and After Optimization (e.g., 30 days after). Export the data to CSV. Calculate ROI with Athena or Excel:\nFormula:ROI (%) = ((Cost Before - Cost After) / Cost Before) * 100 Example in Athena:\nSELECT ((before_cost - after_cost) / before_cost) * 100 AS roi_percentage FROM ( SELECT SUM(CASE WHEN month = \u0026#39;2024-05\u0026#39; THEN amount ELSE 0 END) AS before_cost, SUM(CASE WHEN month = \u0026#39;2024-06\u0026#39; THEN amount ELSE 0 END) AS after_cost FROM s3_cost_data ) t; Automate ROI reports via Email:\nUse AWS Lambda + Amazon SES to send scheduled reports.\nEmail content includes:\nPre-optimization cost.\nPost-optimization cost.\nROI % and total cost savings.\nSchedule monthly runs with EventBridge.\nDisplay on a Dashboard:\nUse Amazon QuickSight to create an “ROI %” KPI widget and cost trend chart.\nDashboard enables ongoing tracking of optimization effectiveness Continuous ROI tracking not only provides transparency but also offers compelling metrics to support future optimization proposals.\n"
 },
 {
-	"uri": "/3-analytics/3.2-storage-capacity-prediction/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/3.2-storage-capacity-prediction/",
 	"title": "Storage Capacity Prediction (Predictive Analytics)",
 	"tags": [],
 	"description": "",
 	"content": " Objective: Use historical data from S3 Inventory to forecast future storage needs for capacity planning.\nPrepare historical data:\nEnsure S3 Inventory has been running for at least 7–14 days to have continuous data. In Athena, create a table containing daily total storage usage: CREATE TABLE daily_storage_usage AS SELECT date(last_modified_date) AS usage_date, SUM(size) / 1024 / 1024 / 1024 AS total_gb FROM s3_inventory_table GROUP BY date(last_modified_date) ORDER BY usage_date; Export this data to S3 for analysis:\nCREATE TABLE daily_storage_export WITH ( format = \u0026#39;CSV\u0026#39;, external_location = \u0026#39;s3://s3-analytics-data/athena-results/daily_storage_usage/\u0026#39; ) AS SELECT * FROM daily_storage_usage; Analyze and predict using Amazon Forecast:\nGo to the Amazon Forecast Console. Create a Dataset of type TARGET_TIME_SERIES from the exported CSV file. Select Domain = Custom, measurement unit = GB. Create a Predictor using the Prophet or DeepAR+ algorithm. Run a forecast with a Forecast horizon = 30 days. View prediction results:\nForecast returns a file containing predicted daily storage usage. You can import this data into QuickSight to visualize the trend. Forecasting storage usage helps proactively plan budgets and adjust lifecycle policies before exceeding desired cost thresholds.\n"
 },
 {
-	"uri": "/3-analytics/3.1-analyze--optimize-storage-class/",
+	"uri": "https://lethuan03.github.io/aws-ws/3-analytics/3.1-analyze--optimize-storage-class/",
 	"title": "Storage Class Analysis &amp; Optimization",
 	"tags": [],
 	"description": "",
 	"content": " Mục tiêu của bước này: Xác định dữ liệu cold hoặc ít truy cập để di chuyển sang Storage Class phù hợp, giúp tối ưu chi phí.\nTruy vấn Athena để tìm đối tượng cold (\u0026gt;90 ngày không chỉnh sửa) và dung lượng lớn:\nSELECT key, size, last_modified_date, storage_class FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date) AND size \u0026gt; 1024*1024*100 -- \u0026gt;100MB ORDER BY size DESC; Xuất danh sách cold objects ra S3:\nCREATE TABLE cold_candidates WITH ( format = \u0026#39;CSV\u0026#39;, external_location = \u0026#39;s3://s3-analytics-data/athena-results/cold_candidates/\u0026#39; ) AS SELECT key FROM s3_inventory_table WHERE last_modified_date \u0026lt; date_add(\u0026#39;day\u0026#39;, -90, current_date); Tạo Lifecycle Policy tự động chuyển cold objects sang S3 Glacier Instant Retrieval:\nTruy cập S3 Console. Chọn bucket cần tối ưu. Tab Management → Lifecycle rules → Create lifecycle rule. Chọn Filter by prefix nếu cần. Chọn Transition current versions of objects → Glacier Instant Retrieval sau 90 ngày. Bật Expire objects nếu muốn xóa sau N ngày. Click Create rule. Việc chuyển Storage Class giúp tiết kiệm 40-80% chi phí cho dữ liệu ít truy cập. Glacier Instant Retrieval vẫn cho phép truy cập gần như tức thời nhưng có giá lưu trữ thấp hơn Standard.\n"
 },
 {
-	"uri": "/4-analytics-for-capacity/",
+	"uri": "https://lethuan03.github.io/aws-ws/4-analytics-for-capacity/",
 	"title": "Analytics for Capacity Planning",
 	"tags": [],
 	"description": "",
 	"content": "\rThis section focuses on applying predictive analytics for storage capacity planning, automating lifecycle policy deployment, and implementing best practices for long-term storage efficiency.\nContent 4.1 – Predictive Analytics for Capacity Planning 4.2 – Automated Lifecycle Policy Deployment 4.3 – Best Practices "
 },
 {
-	"uri": "/4-analytics-for-capacity/4.2-automated-lifecycle-policy-deployment/",
+	"uri": "https://lethuan03.github.io/aws-ws/4-analytics-for-capacity/4.2-automated-lifecycle-policy-deployment/",
 	"title": "Automated Lifecycle Policy Deployment",
 	"tags": [],
 	"description": "",
 	"content": " Objective:\nUse the analysis results (from 1.8 and 1.9) to automatically apply Lifecycle Policies for moving or deleting data according to cost-optimized rules.\nPreparation:\nIdentify the buckets and prefixes where policies should be applied. Define conditions: file age, access patterns, storage size. Create an IAM role with s3:PutLifecycleConfiguration permission. Configure Lambda function:\nOpen AWS Lambda. Create a Python or Node.js function to read analysis results from S3/Glue. Call put_bucket_lifecycle_configuration API to update the policy. Set up EventBridge rule:\nSchedule Lambda to run daily/weekly. Trigger policy updates when forecast data changes. Validation:\nIn S3 Console → Bucket → Management → Lifecycle rules. Ensure the new rules appear and are active. Automation reduces manual management effort and keeps policies aligned with real-world storage trends.\n"
 },
 {
-	"uri": "/4-analytics-for-capacity/4.1-predictive-analytics-for-capacity-planning/",
+	"uri": "https://lethuan03.github.io/aws-ws/4-analytics-for-capacity/4.1-predictive-analytics-for-capacity-planning/",
 	"title": "Predictive Analytics for Capacity Planning",
 	"tags": [],
 	"description": "",
 	"content": "\nObjective:\nUse historical S3 usage data to forecast future storage requirements (3, 6, 12 months) to optimize costs and prevent capacity shortages.\nPrepare the data:\nExport data from S3 Storage Lens or AWS Cost \u0026amp; Usage Report (CUR). Store the data in S3 as CSV/Parquet format. Create a table in AWS Glue Data Catalog. Run forecasting with Amazon Forecast:\nGo to Amazon Forecast. Create a Dataset Group and import the prepared storage data. Select the Prophet or DeepAR+ algorithm for time series forecasting. Generate forecasts for the next 90–365 days. Visualize the results:\nExport forecast output to S3. Integrate it into QuickSight alongside the dashboard from 1.8. Display a growth trend chart for storage usage. Apply the insights:\nAdjust lifecycle policies based on forecasts. Plan budget allocations for upcoming storage needs. This step helps operations teams act proactively, avoiding rushed capacity purchases or wasted storage from unnecessary data retention.\n"
 },
 {
-	"uri": "/4-analytics-for-capacity/4.3-practices/",
+	"uri": "https://lethuan03.github.io/aws-ws/4-analytics-for-capacity/4.3-practices/",
 	"title": "Summary &amp; Best Practices",
 	"tags": [],
 	"description": "",
 	"content": " What we accomplished:\nSet up advanced S3 analytics (1.8). Forecasted future storage needs using Amazon Forecast (1.9). Automated lifecycle policy deployment (1.10). Best Practices:\nRegular monitoring: Review Storage Lens reports monthly. Maximize automation: Use Lambda \u0026amp; EventBridge to minimize manual effort. Tight access control: Grant IAM roles only necessary permissions. Multi-tier storage: Use Glacier for infrequently accessed data. Budget forecasting: Plan finances for at least 6–12 months ahead. Benefits achieved:\nSignificant storage cost savings. Improved data access performance. Reduced operational workload. "
 },
 {
-	"uri": "/5-resource-cleanup/",
+	"uri": "https://lethuan03.github.io/aws-ws/5-resource-cleanup/",
 	"title": "Resource Cleanup",
 	"tags": [],
 	"description": "",
 	"content": "\rCleaning up resources after the workshop is essential to avoid unexpected charges. Proceed carefully — deleted data is usually irrecoverable unless backed up.\nStop and delete services in a safe order\nQuickSight: delete datasets, analyses, dashboards, subscriptions. Forecast: delete datasets, predictors, forecasts, dataset groups. Athena: stop workgroups (if any) and remove named queries; ensure query result S3 location is removed. Glue: delete Crawlers, Jobs, Databases, Tables. Lambda: delete functions and event source mappings. EventBridge: remove targets then delete rules. CloudWatch: delete related log groups. If CUR (Cost \u0026amp; Usage Report) enabled: disable delivery and remove report files from S3. Disable/delete S3 Storage Lens configuration if you enabled metrics export. Safely remove S3 contents\nFor non-versioned buckets: aws s3 rm s3://your-bucket-name --recursive aws s3 rb s3://your-bucket-name For versioned buckets: you must delete all versions and delete markers (example approach): aws s3api list-object-versions --bucket your-bucket-name --query \u0026#39;Versions[].{Key:Key,VersionId:VersionId}\u0026#39; \u0026gt; versions.json # then construct delete payloads and call delete-objects (use script with pagination) For very large buckets consider S3 Batch Operations or scripted pagination.\nRemove Glue / Athena artifacts\nGlue Console → delete Crawlers, Jobs, Databases, Tables. Athena → delete named queries and ensure S3 query results are removed. Remove QuickSight resources\nQuickSight → Manage data → delete datasets, analyses, dashboards. Cancel subscription if not using QuickSight further. Delete Lambda, EventBridge, CloudWatch\nLambda Console → delete functions. EventBridge → remove targets → delete rules. CloudWatch → delete log groups (e.g., /aws/lambda/\u0026lt;function-name\u0026gt;). Remove IAM roles \u0026amp; policies\nDetach policies, delete custom managed policies, then delete roles. Remove inline policies. Delete ML resources (if used)\nForecast → delete datasets, predictors, forecasts, dataset groups. SageMaker → stop \u0026amp; delete endpoints, endpoint-configs, models and training jobs if any. Verify \u0026amp; confirm\nCheck Billing / Cost Explorer within 24–48 hours to confirm no lingering charges. Use aws s3 ls or console to verify buckets are deleted. Safe order: stop services → delete data → delete resources (roles/policies). CUR and some logs retain historical data — removing them deletes historical reports. Deleting large or versioned buckets may take time; consider scripting or S3 Batch Operations. Quick checklist before leaving:\nQuickSight cleaned Forecast cleaned Athena query results removed Glue crawlers/tables removed Lambda \u0026amp; EventBridge removed CloudWatch logs removed IAM roles/policies removed S3 buckets emptied \u0026amp; deleted "
 },
 {
-	"uri": "/categories/",
+	"uri": "https://lethuan03.github.io/aws-ws/categories/",
 	"title": "Categories",
 	"tags": [],
 	"description": "",
 	"content": ""
 },
 {
-	"uri": "/tags/",
+	"uri": "https://lethuan03.github.io/aws-ws/tags/",
 	"title": "Tags",
 	"tags": [],
 	"description": "",
